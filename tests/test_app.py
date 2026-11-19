@@ -30,6 +30,19 @@ def test_get_ticket_1_has_a_title(client):
     assert response.get_json()["title"] == "Laptop not charging"
 
 
+def test_home_displays_resolved_status_for_resolved_ticket(client):
+    response = client.get("/")
+    assert response.status_code == 200
+
+    rows = [
+        row
+        for row in response.get_data(as_text=True).split("<tr>")
+        if "Excel keeps crashing on startup" in row
+    ]
+    assert len(rows) == 1
+    assert '<span class="badge">Resolved</span>' in rows[0]
+
+
 def test_unknown_ticket_returns_404(client):
     response = client.get("/api/tickets/9999")
     assert response.status_code == 404
